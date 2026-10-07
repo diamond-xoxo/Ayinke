@@ -1,0 +1,646 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday Ayinke</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+
+    <!-- ============================================================
+         SECRET MESSAGE MODAL
+    ============================================================ -->
+    <div class="secret-backdrop" id="secretBackdrop" onclick="closeSecretModal()"></div>
+
+    <!-- ============================================================
+         PRIVACY POLICY MODAL
+    ============================================================ -->
+    <div class="secret-backdrop" id="privacyBackdrop" onclick="closePrivacyModal()"></div>
+
+    <div class="privacy-modal" id="privacyModal" role="dialog" aria-modal="true" aria-label="Privacy Policy">
+      <button class="secret-close" onclick="closePrivacyModal()" aria-label="Close Privacy Policy">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="privacy-header">
+        <div class="privacy-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2 class="privacy-title">Privacy Policy</h2>
+        <p class="privacy-subtitle">Last updated: June 9, 2025</p>
+      </div>
+
+      <div class="privacy-body">
+
+        <div class="privacy-section">
+          <p>This Privacy Policy describes how <strong>Tioluwanimi</strong> ("we") collects, uses, and protects your data on our website <a href="https://motunrayoonifade.netlify.app/" target="_blank" rel="noopener noreferrer">https://motunrayoonifade.netlify.app/</a>.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-database"></i> 1. Data We Collect</h3>
+          <p>We collect the following data: <strong>Name, Email, IP Address, Cookies.</strong></p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-chart-bar"></i> 2. Use of Data</h3>
+          <p>Collected data is used to provide services, improve the website, and for analytics purposes.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-shield-halved"></i> 3. Data Protection</h3>
+          <p>We implement technical and organizational measures to protect your data.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-handshake"></i> 4. Sharing Data with Third Parties</h3>
+          <p>We do not share your data with third parties, except as required by law.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-user-shield"></i> 5. Your Rights</h3>
+          <p>You may request access, correction, or deletion of your data by contacting us at: <a href="mailto:onifadeoluwademilade2006@gmail.com">onifadeoluwademilade2006@gmail.com</a>.</p>
+        </div>
+
+        <div class="privacy-section">
+          <h3><i class="fa-solid fa-envelope"></i> 6. Contact Us</h3>
+          <p>If you have any questions, please contact us at: <a href="mailto:onifadeoluwademilade2006@gmail.com">onifadeoluwademilade2006@gmail.com</a>.</p>
+        </div>
+
+      </div>
+
+      <div class="privacy-footer">
+        <button class="btn-primary" onclick="closePrivacyModal()">
+          <i class="fa-solid fa-check"></i> I Understand
+        </button>
+      </div>
+    </div>
+
+    <div class="secret-modal" id="secretModal">
+
+      <!-- Step 1 - Password Screen -->
+      <div class="secret-step" id="stepPassword">
+        <button class="secret-close" onclick="closeSecretModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="secret-lock-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+
+        <h3 class="secret-title">Secret Message</h3>
+        <p class="secret-subtitle">
+          This message is protected. Enter the password to reveal it.
+        </p>
+
+        <div class="secret-input-group">
+          <div class="secret-input-wrapper">
+            <i class="fa-solid fa-key"></i>
+            <input
+              type="password"
+              id="passwordInput"
+              class="secret-input"
+              placeholder="Enter password..."
+              onkeydown="if(event.key==='Enter') checkPassword()"
+            />
+            <button class="toggle-pw" id="togglePw" onclick="togglePassword()">
+              <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+          <p class="secret-error" id="secretError">
+            <i class="fa-solid fa-circle-exclamation"></i> Incorrect password. Try again.<br/>
+            <i class="fa-solid fa-lightbulb" style="color:var(--gold);font-size:0.8rem;"></i>
+            <em style="font-size:0.82rem;color:rgba(255,255,255,0.55);">Hint: A very sweet name for a very sweet Girl <i class="fa-solid fa-face-grin-squint-tears"></i> <i class="fa-solid fa-heart" style="color:var(--gold);"></i></em>
+          </p>
+        </div>
+
+        <button class="btn-primary secret-submit" onclick="checkPassword()">
+          <i class="fa-solid fa-unlock"></i> Unlock Message
+        </button>
+      </div>
+
+      <!-- Step 2 - Message Screen -->
+      <div class="secret-step hidden" id="stepMessage">
+        <button class="secret-close" onclick="closeSecretModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="secret-confetti" id="confettiArea"></div>
+
+        <div class="secret-unlocked-icon">
+          <i class="fa-solid fa-lock-open"></i>
+        </div>
+
+        <p class="secret-from">
+          <i class="fa-solid fa-star"></i> A Message Just For You
+        </p>
+
+        <h2 class="secret-message-title">Happy Birthday, Tioluwanimi ❤️</h2>
+
+        <div class="secret-divider"></div>
+
+        <p class="secret-message-body">
+          Tioluwanimi,
+        </p>
+
+        <p class="secret-message-body">
+          I don't know if you'll ever fully understand how much you mean to me, but I hope you do someday.
+        </p>
+
+        <p class="secret-message-body">
+          Today is your birthday, and despite everything that may have changed between us, I couldn't let this day pass without saying something. You are still someone incredibly important to me, and the memories we've created together will always have a special place in my heart.
+        </p>
+
+        <p class="secret-message-body">
+          I know things aren't exactly where I would want them to be right now. Maybe you don't want to talk to me, maybe you need your space, and I respect that. I won't pretend that it doesn't hurt, because it does. But even through all of that, one thing hasn't changed: I still care about you deeply.
+        </p>
+
+        <p class="secret-message-body">
+          I still find myself hoping you're okay. I still want to see you happy. I still pray that things work out for you, that your dreams come true, and that this new chapter of your life brings you peace, growth, and beautiful moments.
+        </p>
+
+        <p class="secret-message-body">
+          I miss the person I could talk to about everything. I miss the random conversations, the laughter, the little moments that probably didn't seem like much at the time. But looking back, those little moments are some of the ones I treasure most.
+        </p>
+
+        <p class="secret-message-body">
+          I don't know what the future holds for us, and I'm not writing this expecting anything from you. I just wanted you to know that what I felt for you was real, and honestly, a part of me still loves you.
+        </p>
+
+        <p class="secret-message-body">
+          Maybe someday things will make more sense. Maybe we'll find our way back to talking. Maybe life will take us in completely different directions. Whatever happens, I'll always be grateful that I met you and that, for a while, I got to call you mine.
+        </p>
+
+        <p class="secret-message-body">
+          So today, forget everything else for a moment and just celebrate you.
+        </p>
+
+        <p class="secret-message-body">
+          May God bless you with good health, peace of mind, genuine happiness, success, and everything you've been praying for. May you grow into the woman you've always wanted to become, and may this new year of your life be kinder to you than the last.
+        </p>
+
+        <p class="secret-message-body">
+          Happy Birthday, Tioluwanimi. ❤️
+        </p>
+
+        <p class="secret-message-body">
+          I hope you smile a lot today.<br/>
+          I hope you feel loved.<br/>
+          I hope you feel appreciated.<br/>
+          And I hope, even for a moment, you remember that somewhere out here, there is someone who genuinely wishes the very best for you.
+        </p>
+
+        <p class="secret-message-body">
+          Happy birthday, birthday girl. ❤️
+        </p>
+
+        <div class="secret-signature">
+          <i class="fa-solid fa-heart"></i>
+          <span>With love, always. Ife</span>
+        </div>
+
+        <button class="btn-primary secret-relock" onclick="closeSecretModal()">
+          <i class="fa-solid fa-door-open"></i> Close Message
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         LOADER
+    ============================================================ -->
+    <div id="loader">
+      <div class="loader-icon">
+        <i class="fa-solid fa-cake-candles"></i>
+      </div>
+      <p class="loader-text">Creating Memories For Tioluwanimi.....</p>
+      <div class="loader-bar">
+        <div class="loader-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         NAVBAR
+    ============================================================ -->
+    <nav id="navbar">
+      <a href="#hero" class="nav-logo">
+        <i class="fa-solid fa-star"></i> Tioluwanimi's <span>Birthday</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#wishes">Wishes</a></li>
+        <li><a href="#gifts">Memories</a></li>
+        <li><a href="#send-wish">Send Wish</a></li>
+
+      </ul>
+
+      <button class="hamburger" id="hamburger" aria-label="Open Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="mobile-close" id="mobileClose" aria-label="Close Menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <a href="#hero"    onclick="closeMobile()"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="#about"   onclick="closeMobile()"><i class="fa-solid fa-user"></i> About</a>
+      <a href="#gallery" onclick="closeMobile()"><i class="fa-solid fa-images"></i> Gallery</a>
+      <a href="#wishes"  onclick="closeMobile()"><i class="fa-solid fa-heart"></i> Wishes</a>
+      <a href="#gifts"   onclick="closeMobile()"><i class="fa-solid fa-tree"></i> Memories</a>
+      <a href="#send-wish" onclick="closeMobile()"><i class="fa-solid fa-pen-nib"></i> Send Wish</a>
+
+    </div>
+
+    <!-- ============================================================
+         HERO SECTION
+    ============================================================ -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="hero-badge reveal">
+          <i class="fa-solid fa-certificate"></i>
+          <span>Special Celebration</span>
+        </div>
+
+        <h1 class="hero-title reveal">
+          Happy <br />
+          <em>Birthday Tioluwanimi</em>
+        </h1>
+
+        <p class="hero-subtitle reveal">
+          Today is all about you. Your smile, your heart, your beautiful soul, and every little thing that makes you Tioluwnimi. Happy Birthday
+        </p>
+
+        <div class="hero-date reveal">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span>October 8, 2026</span>
+        </div>
+
+        <div class="hero-cta reveal">
+          <a href="#about" class="btn-primary">
+            <i class="fa-solid fa-gift"></i> Explore the Day
+          </a>
+          <button class="btn-ghost" id="secretBtn" onclick="openSecretModal()">
+            <i class="fa-solid fa-lock"></i> Secret Message
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ABOUT SECTION
+    ============================================================ -->
+    <section class="about" id="about">
+      <div class="container">
+        <div class="about-grid">
+
+          <div class="about-image reveal-left">
+            <div class="about-img-wrapper">
+              <video
+                src="her.2.mov"
+                autoplay
+                muted
+                loop
+                playsinline
+                style="width:100%; height:100%; object-fit:cover; border-radius:inherit;"
+              ></video>
+              <div class="about-img-badge">
+                <i class="fa-solid fa-cake-candles"></i>
+                <span>Celebrating Nimi</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-text reveal-right">
+            <p class="section-label">
+              <i class="fa-solid fa-sparkles"></i> About This Day
+            </p>
+            <h2 class="section-title">A Day Worth <em>Celebrating</em></h2>
+            <p class="about-desc">
+              Every year, this special day reminds me of the beautiful gift the world received the moment you were born. Today is more than just another birthday; it is a celebration of you, your heart, your strength, your kindness, your memories, and every little thing that makes you who you are.
+            </p>
+            <p class="about-desc">
+              Tioluwanimi, you are genuinely one of the most beautiful souls I have had the privilege of knowing. Your presence has brought so many moments of happiness, laughter, peace, and even lessons that I will always carry with me. Through every challenge and every joy, you have continued to be someone whose presence matters more than you probably realize.
+            </p>
+            <p class="about-desc">
+              I hope this new chapter brings you everything your heart deserves. May you experience genuine happiness, beautiful surprises, answered prayers, and opportunities that take you closer to the person you dream of becoming. May you never lose the beautiful heart that makes you special, and may life continue to give you reasons to smile.
+            </p>
+            <p class="about-desc">
+              Today, I celebrate your life, your growth, your dreams, and the woman you are becoming. I celebrate every memory we've created, every conversation, every laugh, and every moment that has made knowing you worthwhile.
+            </p>
+            <p class="about-desc">
+              Happy Birthday, Tioluwanimi.
+            </p>
+            <p class="about-desc">
+              May this new year of your life be filled with peace, love, happiness, growth, and countless reasons to be grateful. You deserve a beautiful year, and I genuinely hope it becomes one of the best chapters of your life yet.
+            </p>
+            <p class="about-desc">
+              Happy Birthday, my girl.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GALLERY SECTION
+    ============================================================ -->
+    <section class="gallery" id="gallery">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">
+            <i class="fa-solid fa-images"></i> Memories
+          </p>
+          <h2 class="section-title">Photo <em>Gallery</em></h2>
+          <p class="section-desc">A collection of beautiful moments captured in time.</p>
+        </div>
+
+        <div class="gallery-grid">
+
+          <!-- Video items -->
+          <div class="gallery-item reveal" data-index="7">
+            <video src="her.1.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+
+          <div class="gallery-item reveal" data-index="8">
+            <video src="her.2.mov" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+
+          <div class="gallery-item reveal" data-index="9">
+            <video src="her.3.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+
+          <div class="gallery-item reveal" data-index="10">
+            <video src="her.4.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+
+          <div class="gallery-item reveal" data-index="11">
+            <video src="her.5.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+
+          <div class="gallery-item reveal" data-index="12">
+            <video src="her.6.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-circle-play"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         WISHES SECTION
+    ============================================================ -->
+    <section class="wishes" id="wishes">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">
+            <i class="fa-solid fa-heart"></i> Messages
+          </p>
+          <h2 class="section-title">Birthday <em>Wishes</em></h2>
+          <p class="section-desc">Words from the people who love you most.</p>
+        </div>
+
+        <!-- Wishes render here automatically -->
+        <div class="wishes-grid" id="wishesDisplayGrid"></div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+     PHOTO MARQUEE SECTION
+============================================================ -->
+<section class="gifts" id="gifts">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-label">
+        <i class="fa-solid fa-images"></i> Moments
+      </p>
+      <h2 class="section-title">Beautiful <em>Memories</em></h2>
+      <p class="section-desc">
+        A glimpse into the life of someone truly extraordinary.
+      </p>
+    </div>
+  </div>
+
+  <!-- ROW 1 - scrolls left -->
+  <div class="marquee-wrapper">
+    <div class="marquee-track marquee-left">
+      <div class="marquee-photo"><img src="nimi.1.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.2.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.3.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.4.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.5.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.6.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.7.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.8.jpeg" alt="Nimi" /></div>
+      <!-- Duplicates for seamless loop -->
+      <div class="marquee-photo"><img src="nimi.1.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.2.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.3.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.4.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.5.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.6.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.7.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.8.jpeg" alt="Nimi" /></div>
+    </div>
+  </div>
+
+  <!-- ROW 2 - scrolls right -->
+  <div class="marquee-wrapper" style="margin-top: 1.2rem;">
+    <div class="marquee-track marquee-right">
+      <div class="marquee-photo"><img src="nimi.9.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.10.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.11.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.13.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.14.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.15.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi..jpeg" alt="Nimi" /></div>
+      <!-- Duplicates for seamless loop -->
+      <div class="marquee-photo"><img src="nimi.9.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.10.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.11.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.13.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.14.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi.15.jpeg" alt="Nimi" /></div>
+      <div class="marquee-photo"><img src="nimi..jpeg" alt="Nimi" /></div>
+    </div>
+  </div>
+
+</section>
+
+    <!-- ============================================================
+         SEND A WISH SECTION
+    ============================================================ -->
+    <section class="send-wish-section" id="send-wish">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">
+            <i class="fa-solid fa-pen-nib"></i> Leave a Message
+          </p>
+          <h2 class="section-title">Send Your <em>Wishes</em></h2>
+          <p class="section-desc">Share your birthday wishes for Tioluwanimi - your message will appear right here!</p>
+        </div>
+
+        <!-- Wish Submission Form -->
+        <div class="wish-form-wrapper reveal">
+          <form class="wish-form" id="wishForm" onsubmit="submitWish(event)">
+            <div class="wish-form-row">
+              <div class="wish-form-group">
+                <label for="wishName"><i class="fa-solid fa-user"></i> Your Name</label>
+                <input type="text" id="wishName" placeholder="Enter your name..." required maxlength="50" />
+              </div>
+              <div class="wish-form-group">
+                <label for="wishLocation"><i class="fa-solid fa-location-dot"></i> Location</label>
+                <input type="text" id="wishLocation" placeholder="City, Country..." maxlength="50" />
+              </div>
+            </div>
+            <div class="wish-form-group">
+              <label for="wishMessage"><i class="fa-solid fa-message"></i> Your Message</label>
+              <textarea id="wishMessage" placeholder="Write your birthday wish here..." required maxlength="300" rows="4" oninput="updateCharCount()"></textarea>
+              <span class="char-count"><span id="charCount">0</span>/300</span>
+            </div>
+            <button type="submit" class="btn-primary wish-submit-btn" id="wishSubmitBtn">
+              <i class="fa-solid fa-paper-plane"></i> Send Wish
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TOAST NOTIFICATION
+    ============================================================ -->
+    <div class="wish-toast" id="wishToast">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Your wish has been sent!</span>
+    </div>
+
+
+    <!-- ============================================================
+         FOOTER
+    ============================================================ -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <p class="footer-logo">
+            <i class="fa-solid fa-star"></i> Tioluwanimi's<span>day</span>
+          </p>
+
+          <p class="footer-copy">
+            &copy; Tioluwanimi  2026 Birthday Celebration. Made with Love By Ifeoluwa
+            <i class="fa-solid fa-heart"></i>
+          </p>
+          <p class="footer-privacy">
+            <button class="privacy-link" id="privacyPolicyBtn" onclick="openPrivacyModal()">
+              <i class="fa-solid fa-shield-halved"></i> Privacy Policy
+            </button>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ============================================================
+         LIGHTBOX
+    ============================================================ -->
+    <div class="lightbox" id="lightbox">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <button class="lightbox-prev" id="lightboxPrev" aria-label="Previous">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="lightbox-next" id="lightboxNext" aria-label="Next">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+      <div class="lightbox-img-wrapper">
+        <img id="lightboxImg" src="" alt="Gallery" />
+      </div>
+    </div>
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+
+    <!-- ============================================================
+         VIDEO LIGHTBOX MODAL
+    ============================================================ -->
+    <div class="video-lightbox" id="videoLightbox">
+      <div class="video-lightbox-backdrop" id="videoLightboxBackdrop"></div>
+      <div class="video-lightbox-inner">
+        <button class="video-lightbox-close" id="videoLightboxClose" aria-label="Close video">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <video
+          id="videoLightboxPlayer"
+          controls
+          autoplay
+          playsinline
+          style="max-width:100%; max-height:80vh; border-radius:12px; display:block;"
+        ></video>
+      </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <script src="script.js?v=2"></script>
+    <script>
+      function openPrivacyModal() {
+        document.getElementById('privacyModal').classList.add('active');
+        document.getElementById('privacyBackdrop').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closePrivacyModal() {
+        document.getElementById('privacyModal').classList.remove('active');
+        document.getElementById('privacyBackdrop').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePrivacyModal();
+      });
+    </script>
+
+  </body>
+</html>

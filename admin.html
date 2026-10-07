@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Wish Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #F5C842; --rose: #FF6B9D; --deep: #0D0720; --deep-mid: #1B0E3A;
+      --deep-card: #160B30; --purple: #7C3AED; --blush: #FBBFCA;
+      --white: #FFFFFF; --muted: rgba(255,255,255,0.55); --border: rgba(255,255,255,0.08);
+      --radius: 14px; --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: var(--deep); color: var(--white); min-height: 100vh; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--deep); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--purple), var(--rose)); border-radius: 10px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0.75rem 1.6rem; border-radius: 99px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s var(--ease); }
+    .btn-primary { background: linear-gradient(135deg, var(--purple), var(--rose)); color: var(--white); box-shadow: 0 6px 24px rgba(124,58,237,0.4); }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.12); }
+    .btn-danger { background: rgba(255,107,157,0.1); color: var(--rose); border: 1px solid rgba(255,107,157,0.3); }
+    .btn-danger:hover { background: var(--rose); color: var(--white); box-shadow: 0 6px 20px rgba(255,107,157,0.4); }
+    .btn-ghost { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+    /* LOGIN */
+    #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.18) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(255,107,157,0.12) 0%, transparent 50%), var(--deep); }
+    .login-card { width: 100%; max-width: 420px; background: var(--deep-card); border: 1px solid rgba(124,58,237,0.25); border-radius: 24px; padding: 3rem 2.5rem; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px rgba(124,58,237,0.08); animation: fadeUp 0.6s var(--ease) both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .login-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--rose)); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--white); margin: 0 auto 1.5rem; box-shadow: 0 8px 30px rgba(124,58,237,0.45); animation: iconPulse 2.5s ease infinite; }
+    @keyframes iconPulse { 0%,100% { box-shadow: 0 8px 30px rgba(124,58,237,0.45); } 50% { box-shadow: 0 8px 45px rgba(124,58,237,0.75); } }
+    .login-card h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
+    .login-card > p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; }
+    .input-wrap { position: relative; margin-bottom: 1rem; }
+    .input-wrap .ico { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 0.85rem; pointer-events: none; }
+    .input-wrap input { width: 100%; padding: 0.9rem 3rem 0.9rem 2.8rem; background: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: 99px; color: var(--white); font-family: 'Outfit', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s, box-shadow 0.3s; }
+    .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
+    .input-wrap input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(124,58,237,0.12); }
+    .input-wrap input.shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+    .toggle-eye { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 4px; transition: color 0.3s; }
+    .toggle-eye:hover { color: var(--white); }
+    .login-error { font-size: 0.82rem; color: var(--rose); min-height: 1.2rem; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .login-submit { width: 100%; padding: 0.95rem; font-size: 1rem; }
+    .login-back { display: inline-flex; align-items: center; gap: 6px; margin-top: 1.5rem; font-size: 0.82rem; color: var(--muted); transition: color 0.3s; }
+    .login-back:hover { color: var(--white); }
+
+    /* DASHBOARD */
+    #dashboard { display: none; min-height: 100vh; }
+    .admin-topbar { position: sticky; top: 0; z-index: 100; background: rgba(13,7,32,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; }
+    .topbar-brand i { color: var(--gold); font-size: 1.2rem; }
+    .topbar-brand h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--white); }
+    .topbar-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3); padding: 0.2rem 0.7rem; border-radius: 99px; }
+    .topbar-actions { display: flex; align-items: center; gap: 0.8rem; }
+
+    /* Stats */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border-bottom: 1px solid var(--border); }
+    .stat-box { background: var(--deep-mid); padding: 1.5rem 1rem; text-align: center; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; line-height: 1; color: var(--white); display: block; margin-bottom: 4px; }
+    .stat-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .stat-box.s-visible .stat-num { color: #4ade80; }
+    .stat-box.s-hidden .stat-num { color: var(--rose); }
+    .stat-box.s-pinned .stat-num { color: var(--gold); }
+
+    /* Main */
+    .admin-main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .filter-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap .ico { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.85rem; pointer-events: none; }
+    .search-wrap input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem; background: var(--deep-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--white); font-family: 'Outfit', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+    .search-wrap input:focus { border-color: var(--purple); }
+    .filter-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-tab { padding: 0.5rem 1.1rem; border-radius: 99px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.25s ease; font-family: 'Outfit', sans-serif; }
+    .filter-tab:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+    .filter-tab.active { background: linear-gradient(135deg, var(--purple), var(--rose)); color: var(--white); border-color: transparent; box-shadow: 0 4px 14px rgba(124,58,237,0.4); }
+
+    /* Wish cards */
+    .wishes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+    .admin-wish-card { background: var(--deep-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; display: flex; flex-direction: column; gap: 0.9rem; transition: border-color 0.25s, box-shadow 0.25s; position: relative; overflow: hidden; }
+    .admin-wish-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--rose)); transform: scaleX(0); transform-origin: left; transition: transform 0.3s var(--ease); }
+    .admin-wish-card:hover { border-color: rgba(124,58,237,0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .admin-wish-card:hover::before { transform: scaleX(1); }
+    .admin-wish-card.is-hidden { opacity: 0.4; }
+    .admin-wish-card.is-pinned { border-left: 3px solid var(--gold); }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.8rem; }
+    .card-author { display: flex; align-items: center; gap: 10px; }
+    .card-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--rose)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; color: var(--white); }
+    .card-author-info strong { display: block; font-size: 0.95rem; color: var(--white); margin-bottom: 2px; }
+    .card-author-info span { font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .card-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 99px; }
+    .badge-pinned { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+    .badge-hidden { background: rgba(255,107,157,0.1); color: var(--rose); border: 1px solid rgba(255,107,157,0.25); }
+    .card-message { font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.75; font-style: italic; border-left: 2px solid rgba(124,58,237,0.3); padding-left: 0.9rem; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+    .card-date { font-size: 0.72rem; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 5px; }
+    .card-actions { display: flex; gap: 0.4rem; }
+    .action-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; transition: all 0.2s ease; }
+    .action-btn:hover { transform: scale(1.1); }
+    .pin-btn:hover, .pin-btn.on { color: var(--gold); border-color: rgba(245,200,66,0.4); background: rgba(245,200,66,0.08); }
+    .hide-btn:hover, .hide-btn.on { color: var(--blush); border-color: rgba(251,191,202,0.4); background: rgba(251,191,202,0.08); }
+    .del-btn:hover { color: var(--rose); border-color: rgba(255,107,157,0.4); background: rgba(255,107,157,0.08); }
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--muted); }
+    .empty-state i { font-size: 3rem; color: rgba(124,58,237,0.3); display: block; margin-bottom: 1rem; }
+
+    /* Danger zone */
+    .danger-zone { margin-top: 2.5rem; padding: 1.5rem; background: rgba(255,107,157,0.05); border: 1px solid rgba(255,107,157,0.15); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .danger-zone-info h4 { font-size: 0.95rem; color: var(--rose); margin-bottom: 3px; }
+    .danger-zone-info p { font-size: 0.82rem; color: var(--muted); }
+
+    @media (max-width: 700px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .admin-topbar { padding: 0.9rem 1.2rem; }
+      .admin-main { padding: 1.5rem 1rem 3rem; }
+      .wishes-grid { grid-template-columns: 1fr; }
+      .topbar-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-icon"><i class="fa-solid fa-user-shield"></i></div>
+      <h1>Admin Panel</h1>
+      <p>Enter your password to manage birthday wishes.</p>
+      <div class="input-wrap">
+        <i class="fa-solid fa-key ico"></i>
+        <input type="password" id="loginPw" placeholder="Admin password..." onkeydown="if(event.key==='Enter') doLogin()" />
+        <button class="toggle-eye" onclick="toggleEye()"><i class="fa-solid fa-eye" id="eyeIco"></i></button>
+      </div>
+      <p class="login-error" id="loginErr"></p>
+      <button class="btn btn-primary login-submit" onclick="doLogin()">
+        <i class="fa-solid fa-unlock"></i> Login
+      </button>
+      <a href="index.html" class="login-back">
+        <i class="fa-solid fa-arrow-left"></i> Back to Birthday Site
+      </a>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+
+    <header class="admin-topbar">
+      <div class="topbar-brand">
+        <i class="fa-solid fa-shield-halved"></i>
+        <h2>Wish Manager</h2>
+        <span class="topbar-badge">Admin</span>
+      </div>
+      <div class="topbar-actions">
+        <a href="index.html" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back to Site</a>
+        <button class="btn btn-ghost" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat-box"><span class="stat-num" id="sTotal">0</span><span class="stat-label">Total</span></div>
+      <div class="stat-box s-visible"><span class="stat-num" id="sVisible">0</span><span class="stat-label">Visible</span></div>
+      <div class="stat-box s-hidden"><span class="stat-num" id="sHidden">0</span><span class="stat-label">Hidden</span></div>
+      <div class="stat-box s-pinned"><span class="stat-num" id="sPinned">0</span><span class="stat-label">Pinned</span></div>
+    </div>
+
+    <main class="admin-main">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass ico"></i>
+          <input type="text" id="searchInput" placeholder="Search by name or message..." oninput="applyFilters()" />
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tab" onclick="setFilter('visible',this)">Visible</button>
+          <button class="filter-tab" onclick="setFilter('hidden',this)">Hidden</button>
+          <button class="filter-tab" onclick="setFilter('pinned',this)">Pinned</button>
+        </div>
+      </div>
+
+      <div class="wishes-grid" id="wishesGrid"></div>
+
+      <div class="danger-zone">
+        <div class="danger-zone-info">
+          <h4><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h4>
+          <p>Permanently delete all submitted wishes. This cannot be undone.</p>
+        </div>
+        <button class="btn btn-danger" onclick="clearAllWishes()">
+          <i class="fa-solid fa-trash"></i> Delete All Wishes
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
