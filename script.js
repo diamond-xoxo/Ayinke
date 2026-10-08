@@ -541,198 +541,47 @@ updateCountdown();
 setInterval(updateCountdown, 1000);
 
 /* ============================================================
-   MUSIC PLAYER
+   BACKGROUND MUSIC — floating toggle button
 ============================================================ */
-const tracks = [
-  { 
-    title: 'Double', 
-    artist: 'Kizz Daniel', 
-    src: 'Kizz-Daniel-Double-(TrendyBeatz.com).mp3'
-  },
-  { 
-    title: 'Pak N Go', 
-    artist: 'Kizz Daniel', 
-    src: 'Kizz-Daniel-Pak-N-Go-[TrendyBeatz.com].mp3'
-  },
-  { 
-    title: 'Joromi', 
-    artist: 'Simi', 
-    src: 'Simi-Joromi-[TrendyBeatz.com].mp3'
-  },
-  { 
-    title: 'Tiff', 
-    artist: 'Simi', 
-    src: 'Simi-Tiff-[TrendyBeatz.com].mp3'
-  },
-  { 
-    title: 'You4Me', 
-    artist: 'Tiwa Savage', 
-    src: 'Tiwa-Savage-You4Me-(TrendyBeatz.com).mp3'
-  }
-];
+const bgAudio = new Audio('jade-lemac-constellations.mp3');
+bgAudio.loop   = true;
+bgAudio.volume = 0.5;
 
-let currentTrack = 0;
-let isPlaying = false;
-let isShuffle = false;
-let isRepeat = false;
+let bgPlaying = false;
 
-// Create audio element
-const audio = new Audio();
-audio.volume = 0.8;
+const musicBtn  = document.getElementById('musicToggleBtn');
+const musicIcon = document.getElementById('musicToggleIcon');
 
-const playBtn = document.getElementById('playBtn');
-const playIcon = document.getElementById('playIcon');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const shuffleBtn = document.getElementById('shuffleBtn');
-const repeatBtn = document.getElementById('repeatBtn');
-const playerTrack = document.getElementById('playerTrack');
-const playerArtist = document.getElementById('playerArtist');
-const progressFill = document.getElementById('progressFill');
-const progressThumb = document.getElementById('progressThumb');
-const currentTimeEl = document.getElementById('currentTime');
-const totalTimeEl = document.getElementById('totalTime');
-const playerArt = document.getElementById('playerArt');
-const trackItems = document.querySelectorAll('.playlist-track');
-const volumeSlider = document.getElementById('volumeSlider');
-
-function formatTime(secs) {
-  if (isNaN(secs)) return "0:00";
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-function loadTrack(index) {
-  const track = tracks[index];
-  if (playerTrack) playerTrack.textContent = track.title;
-  if (playerArtist) playerArtist.textContent = track.artist;
-  
-  audio.src = track.src;
-  audio.load();
-
-  // Highlight playlist track
-  trackItems.forEach(item => item.classList.remove('active-track'));
-  const activeItem = document.querySelector(`.playlist-track[data-index="${index}"]`);
-  if (activeItem) {
-    activeItem.classList.add('active-track');
-    activeItem.querySelector('.track-num').innerHTML = '<i class="fa-solid fa-wave-square"></i>';
-  }
-
-  // Reset other track numbers
-  trackItems.forEach((item, i) => {
-    if (i !== index) {
-      item.querySelector('.track-num').textContent = i + 1;
-    }
-  });
-}
-
-function play() {
-  isPlaying = true;
-  if (playIcon) playIcon.className = 'fa-solid fa-pause';
-  if (playerArt) playerArt.classList.add('spinning');
-  audio.play().catch(e => console.error("Playback prevented by browser", e));
-}
-
-function pause() {
-  isPlaying = false;
-  if (playIcon) playIcon.className = 'fa-solid fa-play';
-  if (playerArt) playerArt.classList.remove('spinning');
-  audio.pause();
-}
-
-function nextTrack() {
-  if (isShuffle) {
-    currentTrack = Math.floor(Math.random() * tracks.length);
+function toggleBgMusic() {
+  if (bgPlaying) {
+    bgAudio.pause();
+    bgPlaying = false;
+    if (musicIcon) musicIcon.className = 'fa-solid fa-music';
+    if (musicBtn)  musicBtn.classList.remove('playing');
   } else {
-    currentTrack = (currentTrack + 1) % tracks.length;
+    bgAudio.play().catch(() => {});
+    bgPlaying = true;
+    if (musicIcon) musicIcon.className = 'fa-solid fa-pause';
+    if (musicBtn)  musicBtn.classList.add('playing');
   }
-  loadTrack(currentTrack);
-  if (isPlaying) play();
 }
 
-function prevTrack() {
-  if (audio.currentTime > 3) {
-    audio.currentTime = 0;
-    return;
+if (musicBtn) musicBtn.addEventListener('click', toggleBgMusic);
+
+// Auto-start on first user interaction
+function startMusicOnce() {
+  if (!bgPlaying) {
+    bgAudio.play().then(() => {
+      bgPlaying = true;
+      if (musicIcon) musicIcon.className = 'fa-solid fa-pause';
+      if (musicBtn)  musicBtn.classList.add('playing');
+    }).catch(() => {});
   }
-  currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
-  loadTrack(currentTrack);
-  if (isPlaying) play();
+  document.removeEventListener('click', startMusicOnce);
+  document.removeEventListener('touchstart', startMusicOnce);
 }
-
-// Audio event listeners
-audio.addEventListener('timeupdate', () => {
-  if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  if (progressFill) progressFill.style.width = pct + '%';
-  if (progressThumb) progressThumb.style.left = `calc(${pct}% - 6px)`;
-  if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
-});
-
-audio.addEventListener('loadedmetadata', () => {
-  if (totalTimeEl) totalTimeEl.textContent = formatTime(audio.duration);
-  const activeItem = document.querySelector(`.playlist-track[data-index="${currentTrack}"] .track-duration`);
-  if (activeItem) {
-    activeItem.textContent = formatTime(audio.duration);
-  }
-});
-
-audio.addEventListener('ended', () => {
-  if (isRepeat) {
-    audio.currentTime = 0;
-    play();
-  } else {
-    nextTrack();
-  }
-});
-
-if (playBtn) playBtn.addEventListener('click', () => {
-  isPlaying ? pause() : play();
-});
-
-if (nextBtn) nextBtn.addEventListener('click', nextTrack);
-if (prevBtn) prevBtn.addEventListener('click', prevTrack);
-
-if (shuffleBtn) shuffleBtn.addEventListener('click', () => {
-  isShuffle = !isShuffle;
-  shuffleBtn.classList.toggle('active-ctrl', isShuffle);
-});
-
-if (repeatBtn) repeatBtn.addEventListener('click', () => {
-  isRepeat = !isRepeat;
-  repeatBtn.classList.toggle('active-ctrl', isRepeat);
-});
-
-// Volume control
-if (volumeSlider) {
-  volumeSlider.addEventListener('input', (e) => {
-    audio.volume = e.target.value / 100;
-  });
-}
-
-// Click playlist track
-trackItems.forEach((item, index) => {
-  item.addEventListener('click', () => {
-    currentTrack = index;
-    loadTrack(currentTrack);
-    play();
-  });
-});
-
-// Click progress bar to seek (guarded)
-const _progressBar = document.getElementById('progressBar');
-if (_progressBar) {
-  _progressBar.addEventListener('click', (e) => {
-    if (!audio.duration) return;
-    const rect = _progressBar.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  });
-}
-
-// Initialize player
-loadTrack(0);
+document.addEventListener('click', startMusicOnce);
+document.addEventListener('touchstart', startMusicOnce);
 
 /* ============================================================
    SECRET MESSAGE MODAL
