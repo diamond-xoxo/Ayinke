@@ -7,16 +7,21 @@
 /* ============================================================
    1. LOADER
 ============================================================ */
-window.addEventListener('load', () => {
+function hideLoader() {
   const loader = document.getElementById('loader');
+  if (!loader || loader.classList.contains('hidden')) return;
+  loader.classList.add('hidden');
+  document.body.style.overflow = 'auto';
+  triggerHeroAnimations();
+}
 
-  setTimeout(() => {
-    loader.classList.add('hidden');
-    document.body.style.overflow = 'auto';
+// Hide loader after max 3s no matter what (videos shouldn't block this)
+const loaderTimeout = setTimeout(hideLoader, 3000);
 
-    // Trigger hero animations after loader hides
-    triggerHeroAnimations();
-  }, 2500);
+// If page loads fast, hide sooner
+window.addEventListener('load', () => {
+  clearTimeout(loaderTimeout);
+  setTimeout(hideLoader, 800);
 });
 
 // Prevent scroll while loading
@@ -144,6 +149,24 @@ const revealObserver = new IntersectionObserver(
 
 document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
   revealObserver.observe(el);
+});
+
+/* ============================================================
+   6b. LAZY VIDEO AUTOPLAY — play only when in viewport
+============================================================ */
+const videoObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const video = entry.target;
+    if (entry.isIntersecting) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  });
+}, { threshold: 0.25 });
+
+document.querySelectorAll('.gallery-item video').forEach(video => {
+  videoObserver.observe(video);
 });
 
 /* ============================================================
