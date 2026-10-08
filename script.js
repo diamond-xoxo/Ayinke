@@ -589,9 +589,6 @@ function checkPassword() {
     input.classList.remove('error');
     error.classList.remove('show');
 
-    // Pause main music player if playing
-    if (isPlaying) pause();
-    
     // Play secret message audio
     secretAudio.currentTime = 0;
     secretAudio.play().catch(e => console.error("Playback prevented", e));
