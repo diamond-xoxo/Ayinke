@@ -540,48 +540,7 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ============================================================
-   BACKGROUND MUSIC — floating toggle button
-============================================================ */
-const bgAudio = new Audio('jade-lemac-constellations.mp3');
-bgAudio.loop   = true;
-bgAudio.volume = 0.5;
 
-let bgPlaying = false;
-
-const musicBtn  = document.getElementById('musicToggleBtn');
-const musicIcon = document.getElementById('musicToggleIcon');
-
-function toggleBgMusic() {
-  if (bgPlaying) {
-    bgAudio.pause();
-    bgPlaying = false;
-    if (musicIcon) musicIcon.className = 'fa-solid fa-music';
-    if (musicBtn)  musicBtn.classList.remove('playing');
-  } else {
-    bgAudio.play().catch(() => {});
-    bgPlaying = true;
-    if (musicIcon) musicIcon.className = 'fa-solid fa-pause';
-    if (musicBtn)  musicBtn.classList.add('playing');
-  }
-}
-
-if (musicBtn) musicBtn.addEventListener('click', toggleBgMusic);
-
-// Auto-start on first user interaction
-function startMusicOnce() {
-  if (!bgPlaying) {
-    bgAudio.play().then(() => {
-      bgPlaying = true;
-      if (musicIcon) musicIcon.className = 'fa-solid fa-pause';
-      if (musicBtn)  musicBtn.classList.add('playing');
-    }).catch(() => {});
-  }
-  document.removeEventListener('click', startMusicOnce);
-  document.removeEventListener('touchstart', startMusicOnce);
-}
-document.addEventListener('click', startMusicOnce);
-document.addEventListener('touchstart', startMusicOnce);
 
 /* ============================================================
    SECRET MESSAGE MODAL
