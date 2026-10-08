@@ -1,17 +1,12 @@
-﻿/* ============================================================
-   ADMIN.JS — Wish Manager for Tioluwanimi's Birthday
+/* ============================================================
+   ADMIN.JS — Wish Manager (Firebase Firestore)
 ============================================================ */
 
-const ADMIN_PASS = 'Ayinke';   
-const WISHES_KEY = 'hbd_tioluwanimi_wishes'; 
+const ADMIN_PASS = 'Ayinke';
 let currentFilter = 'all';
+let _allWishes = [];
 
-/* ── Storage ── */
-function getWishes() {
-  try { return JSON.parse(localStorage.getItem(WISHES_KEY)) || []; }
-  catch { return []; }
-}
-function saveWishes(w) { localStorage.setItem(WISHES_KEY, JSON.stringify(w)); }
+const adminDb = window.db;
 
 /* ── Helpers ── */
 function escapeHtml(s) {
@@ -20,10 +15,24 @@ function escapeHtml(s) {
   return d.innerHTML;
 }
 function fmtDate(ts) {
-  return new Date(ts).toLocaleDateString('en-US', {
+  if (!ts) return '—';
+  const date = ts.toDate ? ts.toDate() : new Date(ts);
+  return date.toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
+}
+
+/* ── Fetch all wishes from Firestore ── */
+function fetchWishes(callback) {
+  adminDb.collection('wishes').orderBy('timestamp', 'desc').get()
+    .then(snapshot => {
+      const wishes = [];
+      snapshot.forEach(doc => wishes.push({ id: doc.id, ...doc.data() }));
+      _allWishes = wishes;
+      if (callback) callback(wishes);
+    })
+    .catch(err => console.error('fetchWishes error:', err));
 }
 
 /* ── Login ── */
@@ -65,12 +74,13 @@ function toggleEye() {
 
 /* ── Dashboard ── */
 function renderDashboard() {
-  const all = getWishes();
-  document.getElementById('sTotal').textContent   = all.length;
-  document.getElementById('sVisible').textContent = all.filter(w => !w.hidden).length;
-  document.getElementById('sHidden').textContent  = all.filter(w =>  w.hidden).length;
-  document.getElementById('sPinned').textContent  = all.filter(w =>  w.pinned).length;
-  applyFilters();
+  fetchWishes(function(all) {
+    document.getElementById('sTotal').textContent   = all.length;
+    document.getElementById('sVisible').textContent = all.filter(w => !w.hidden).length;
+    document.getElementById('sHidden').textContent  = all.filter(w =>  w.hidden).length;
+    document.getElementById('sPinned').textContent  = all.filter(w =>  w.pinned).length;
+    applyFilters();
+  });
 }
 
 function setFilter(f, el) {
@@ -82,7 +92,7 @@ function setFilter(f, el) {
 
 function applyFilters() {
   const query = (document.getElementById('searchInput').value || '').toLowerCase();
-  let wishes = getWishes();
+  let wishes = [..._allWishes];
 
   if (currentFilter === 'visible') wishes = wishes.filter(w => !w.hidden);
   if (currentFilter === 'hidden')  wishes = wishes.filter(w =>  w.hidden);
@@ -96,11 +106,9 @@ function applyFilters() {
     );
   }
 
-  /* Pinned always first */
   wishes = [...wishes.filter(w => w.pinned), ...wishes.filter(w => !w.pinned)];
 
   const grid = document.getElementById('wishesGrid');
-
   if (wishes.length === 0) {
     grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No wishes found.</p></div>';
     return;
@@ -145,27 +153,35 @@ function applyFilters() {
 
 /* ── Actions ── */
 function togglePin(id) {
-  const wishes = getWishes();
-  const w = wishes.find(x => x.id === id);
-  if (w) { w.pinned = !w.pinned; saveWishes(wishes); renderDashboard(); }
+  const w = _allWishes.find(x => x.id === id);
+  if (!w) return;
+  adminDb.collection('wishes').doc(id).update({ pinned: !w.pinned })
+    .then(() => renderDashboard())
+    .catch(err => console.error('togglePin error:', err));
 }
 
 function toggleHide(id) {
-  const wishes = getWishes();
-  const w = wishes.find(x => x.id === id);
-  if (w) { w.hidden = !w.hidden; saveWishes(wishes); renderDashboard(); }
+  const w = _allWishes.find(x => x.id === id);
+  if (!w) return;
+  adminDb.collection('wishes').doc(id).update({ hidden: !w.hidden })
+    .then(() => renderDashboard())
+    .catch(err => console.error('toggleHide error:', err));
 }
 
 function deleteWish(id) {
   if (!confirm('Delete this wish permanently?')) return;
-  saveWishes(getWishes().filter(x => x.id !== id));
-  renderDashboard();
+  adminDb.collection('wishes').doc(id).delete()
+    .then(() => renderDashboard())
+    .catch(err => console.error('deleteWish error:', err));
 }
 
 function clearAllWishes() {
   if (!confirm('Delete ALL wishes? This cannot be undone.')) return;
-  saveWishes([]);
-  renderDashboard();
+  const batch = adminDb.batch();
+  _allWishes.forEach(w => batch.delete(adminDb.collection('wishes').doc(w.id)));
+  batch.commit()
+    .then(() => renderDashboard())
+    .catch(err => console.error('clearAll error:', err));
 }
 
 /* ── Keyboard: Enter to login ── */

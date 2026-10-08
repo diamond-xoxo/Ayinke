@@ -932,53 +932,24 @@ if (backToTopBtn) {
 }
 
 /* ============================================================
-   COMMUNITY WISHES SYSTEM
+   COMMUNITY WISHES SYSTEM — Firebase Firestore (real-time)
 ============================================================ */
-(function() {
-  var WISHES_KEY = 'hbd_tioluwanimi_wishes';
-  var _wishes = [];
-
-  /* Check if localStorage is available */
-  var _lsOk = (function() {
-    try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); return true; }
-    catch(e) { return false; }
-  })();
-
-  /* Load saved wishes from localStorage on init */
-  if (_lsOk) {
-    try {
-      var stored = localStorage.getItem(WISHES_KEY);
-      if (stored) _wishes = JSON.parse(stored);
-    } catch(e) { _wishes = []; }
-  }
-
-  /* Storage helpers */
-  function getWishes() { return _wishes.slice(); }
-
-  function saveWishes(list) {
-    _wishes = list;
-    if (_lsOk) {
-      try { localStorage.setItem(WISHES_KEY, JSON.stringify(list)); }
-      catch(e) { /* quota/blocked – memory only */ }
-    }
-  }
+(function () {
+  var db = window.db;
 
   /* Utils */
-  function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  }
   function escapeHtml(str) {
     var d = document.createElement('div');
     d.appendChild(document.createTextNode(str));
     return d.innerHTML;
   }
   function fmtDate(ts) {
-    return new Date(ts).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', year: 'numeric'
-    });
+    if (!ts) return '';
+    var date = ts.toDate ? ts.toDate() : new Date(ts);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  /* Build a wish card HTML string */
+  /* Build a wish card */
   function wishCardHTML(w, showPin) {
     return '<div class="wish-card' + (w.pinned ? ' pinned-wish' : '') + '" data-id="' + w.id + '">' +
       (w.pinned && showPin ? '<div class="pin-badge"><i class="fa-solid fa-thumbtack"></i> Pinned</div>' : '') +
@@ -986,93 +957,95 @@ if (backToTopBtn) {
       '<p>' + escapeHtml(w.message) + '</p>' +
       '<div class="wish-author">' +
         '<div class="wish-avatar"><i class="fa-solid fa-user"></i></div>' +
-        '<div>' +
-          '<h4>' + escapeHtml(w.name) + '</h4>' +
-          '<span><i class="fa-solid fa-location-dot"></i> ' + escapeHtml(w.location) + '</span>' +
-        '</div>' +
+        '<div><h4>' + escapeHtml(w.name) + '</h4>' +
+        '<span><i class="fa-solid fa-location-dot"></i> ' + escapeHtml(w.location || 'Somewhere special') + '</span></div>' +
         '<span class="wish-time">' + fmtDate(w.timestamp) + '</span>' +
-      '</div>' +
-    '</div>';
+      '</div></div>';
   }
 
-  /* Add tilt effect to cards in a grid */
+  /* Tilt effect */
   function addTilt(grid) {
-    grid.querySelectorAll('.wish-card').forEach(function(card) {
-      card.addEventListener('mousemove', function(e) {
-        var r  = card.getBoundingClientRect();
-        var rx = ((e.clientY - r.top  - r.height / 2) / (r.height / 2)) * -6;
-        var ry = ((e.clientX - r.left - r.width  / 2) / (r.width  / 2)) *  6;
+    grid.querySelectorAll('.wish-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var rx = ((e.clientY - r.top - r.height / 2) / (r.height / 2)) * -6;
+        var ry = ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * 6;
         card.style.transform = 'translateY(-8px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
         card.style.transition = 'transform 0.1s ease';
       });
-      card.addEventListener('mouseleave', function() {
+      card.addEventListener('mouseleave', function () {
         card.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
         card.style.transition = 'transform 0.4s ease';
       });
     });
   }
 
-  /* Render top Wishes section (#wishesDisplayGrid) - shows all visible wishes */
-  function renderWishesSection() {
-    var grid = document.getElementById('wishesDisplayGrid');
-    if (!grid) return;
-    var all     = getWishes();
-    var visible = all.filter(function(w) { return !w.hidden; });
-    var pinned  = visible.filter(function(w) { return w.pinned; });
-    var rest    = visible.filter(function(w) { return !w.pinned; });
-    var sorted  = pinned.concat(rest);
-    grid.innerHTML = sorted.map(function(w) { return wishCardHTML(w, false); }).join('');
-    addTilt(grid);
+  /* Real-time Firestore listener — updates all grids instantly */
+  if (db) {
+    db.collection('wishes').orderBy('timestamp', 'desc').onSnapshot(function (snapshot) {
+      var wishes = [];
+      snapshot.forEach(function (doc) {
+        var d = doc.data();
+        d.id = doc.id;
+        wishes.push(d);
+      });
+
+      /* --- Wishes display grid (all visible) --- */
+      var displayGrid = document.getElementById('wishesDisplayGrid');
+      if (displayGrid) {
+        var visible = wishes.filter(function (w) { return !w.hidden; });
+        var sorted  = visible.filter(function (w) { return w.pinned; })
+                             .concat(visible.filter(function (w) { return !w.pinned; }));
+        displayGrid.innerHTML = sorted.map(function (w) { return wishCardHTML(w, false); }).join('');
+        addTilt(displayGrid);
+      }
+
+      /* --- Community wishes grid (non-seeded only) --- */
+      var communityGrid = document.getElementById('communityWishesGrid');
+      var noMsg         = document.getElementById('noWishesMsg');
+      var header        = document.getElementById('communityWishesHeader');
+      var badge         = document.getElementById('wishCount');
+
+      var userWishes  = wishes.filter(function (w) { return !w.seeded && !w.hidden; });
+      var pinnedFirst = userWishes.filter(function (w) { return w.pinned; })
+                                  .concat(userWishes.filter(function (w) { return !w.pinned; }));
+
+      if (badge)  badge.textContent = userWishes.length;
+
+      if (pinnedFirst.length === 0) {
+        if (communityGrid) communityGrid.innerHTML = '';
+        if (noMsg)  noMsg.style.display  = 'flex';
+        if (header) header.style.display = 'none';
+      } else {
+        if (noMsg)  noMsg.style.display  = 'none';
+        if (header) header.style.display = 'block';
+        if (communityGrid) {
+          communityGrid.innerHTML = pinnedFirst.map(function (w) { return wishCardHTML(w, true); }).join('');
+          addTilt(communityGrid);
+        }
+      }
+    }, function (err) {
+      console.error('Firestore snapshot error:', err);
+    });
   }
 
-  /* Render community wishes section (#communityWishesGrid) - shows only non-seeded submissions */
-  window.renderCommunityWishes = function() {
-    var grid   = document.getElementById('communityWishesGrid');
-    var noMsg  = document.getElementById('noWishesMsg');
-    var header = document.getElementById('communityWishesHeader');
-    var badge  = document.getElementById('wishCount');
-    if (!grid) return;
-
-    var all     = getWishes();
-    var visible = all.filter(function(w) { return !w.hidden && !w.seeded; });
-    var pinned  = visible.filter(function(w) { return w.pinned; });
-    var rest    = visible.filter(function(w) { return !w.pinned; });
-    var sorted  = pinned.concat(rest);
-
-    if (badge) badge.textContent = visible.length;
-
-    if (sorted.length === 0) {
-      grid.innerHTML = '';
-      if (noMsg)  noMsg.style.display  = 'flex';
-      if (header) header.style.display = 'none';
-    } else {
-      if (noMsg)  noMsg.style.display  = 'none';
-      if (header) header.style.display = 'block';
-      grid.innerHTML = sorted.map(function(w) { return wishCardHTML(w, true); }).join('');
-      addTilt(grid);
-    }
-
-    /* Also refresh the top wishes section */
-    renderWishesSection();
-  };
-
   /* Character counter */
-  window.updateCharCount = function() {
+  window.updateCharCount = function () {
     var msg = document.getElementById('wishMessage');
     var cnt = document.getElementById('charCount');
     if (msg && cnt) cnt.textContent = msg.value.length;
   };
 
   /* Toast */
-  window.showToast = function() {
+  window.showToast = function () {
     var t = document.getElementById('wishToast');
     if (!t) return;
     t.classList.add('show');
-    setTimeout(function() { t.classList.remove('show'); }, 3500);
+    setTimeout(function () { t.classList.remove('show'); }, 3500);
   };
 
-  /* Submit a wish */
-  window.submitWish = function(e) {
+  /* Submit wish to Firestore */
+  window.submitWish = function (e) {
     e.preventDefault();
     var nameEl = document.getElementById('wishName');
     var locEl  = document.getElementById('wishLocation');
@@ -1080,7 +1053,6 @@ if (backToTopBtn) {
     var btn    = document.getElementById('wishSubmitBtn');
 
     if (!nameEl || !msgEl || !btn) return;
-
     var name    = nameEl.value.trim();
     var loc     = locEl ? locEl.value.trim() : '';
     var message = msgEl.value.trim();
@@ -1089,40 +1061,24 @@ if (backToTopBtn) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
-    setTimeout(function() {
-      try {
-        var wish = {
-          id:        genId(),
-          name:      name,
-          location:  loc || 'Somewhere special',
-          message:   message,
-          timestamp: Date.now(),
-          hidden:    false,
-          pinned:    false,
-          seeded:    false
-        };
-        var list = getWishes();
-        list.unshift(wish);
-        saveWishes(list);
-
-        var form = document.getElementById('wishForm');
-        var cnt  = document.getElementById('charCount');
-        if (form) form.reset();
-        if (cnt)  cnt.textContent = '0';
-
-        window.showToast();
-        window.renderCommunityWishes();
-      } catch(err) {
-        console.error('submitWish error:', err);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Wish';
-      }
-    }, 800);
-  };
-
-  /* Init - render both grids on page load */
-  renderWishesSection();
-  window.renderCommunityWishes();
+    db.collection('wishes').add({
+      name:      name,
+      location:  loc || 'Somewhere special',
+      message:   message,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      hidden:    false,
+      pinned:    false,
+      seeded:    false
+    }).then(function () {
+      var form = document.getElementById('wishForm');
+      var cnt  = document.getElementById('charCount');
+      if (form) form.reset();
+      if (cnt)  cnt.textContent = '0';
+      window.showToast();
+    }).catch(function (err) {
+      console.error('submitWish error:', err);
+    }).finally(function () {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Wish';
 
 })();
