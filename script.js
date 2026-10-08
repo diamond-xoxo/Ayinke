@@ -715,7 +715,7 @@ loadTrack(0);
    SECRET MESSAGE MODAL
 ============================================================ */
 
-const secretAudio = new Audio('Jade-LeMac-Constellations.mp3');
+const secretAudio = new Audio('jade-lemac-constellations.mp3');
 secretAudio.loop = true;
 
 // Change this to whatever password you want
