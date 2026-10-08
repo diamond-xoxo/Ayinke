@@ -1103,5 +1103,7 @@ if (backToTopBtn) {
     }).finally(function () {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Wish';
+    });
+  };
 
 })();
